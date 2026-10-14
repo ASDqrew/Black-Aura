@@ -22,8 +22,10 @@ from urllib.parse import urlparse
 
 MOSCOW_BBOX = "55.489,37.205,56.009,37.967"
 DEFAULT_OVERPASS_URLS = (
-    "https://overpass-api.de/api/interpreter",
+    "https://overpass.private.coffee/api/interpreter",
     "https://overpass.kumi.systems/api/interpreter",
+    "https://overpass-api.de/api/interpreter",
+    "https://overpass.nchc.org.tw/api/interpreter",
 )
 
 SOCIAL_HOSTS = {
@@ -285,20 +287,20 @@ def deduplicate(leads: Iterable[Lead]) -> list[Lead]:
 
 
 def overpass_query(bbox: str) -> str:
-    return f"""[out:json][timeout:60];
+    return f"""[out:json][timeout:25];
 (
-  nwr[\"shop\"=\"hairdresser\"][\"name\"]({bbox});
-  nwr[\"shop\"=\"beauty\"][\"name\"]({bbox});
+  nwr[\"shop\"~\"^(hairdresser|beauty)$\"][\"name\"]({bbox});
   nwr[\"beauty\"][\"name\"]({bbox});
   nwr[\"craft\"=\"beautician\"][\"name\"]({bbox});
 );
-out center tags;"""
+out tags;"""
 
 
 def fetch_overpass(bbox: str, endpoints: Iterable[str] = DEFAULT_OVERPASS_URLS) -> dict:
     data = urllib.parse.urlencode({"data": overpass_query(bbox)}).encode("utf-8")
     errors: list[str] = []
     for endpoint in endpoints:
+        print(f"Пробую источник: {endpoint}", file=sys.stderr, flush=True)
         request = urllib.request.Request(
             endpoint,
             data=data,
@@ -309,11 +311,11 @@ def fetch_overpass(bbox: str, endpoints: Iterable[str] = DEFAULT_OVERPASS_URLS) 
             method="POST",
         )
         try:
-            with urllib.request.urlopen(request, timeout=90) as response:
+            with urllib.request.urlopen(request, timeout=40) as response:
                 return json.load(response)
         except (urllib.error.URLError, TimeoutError, json.JSONDecodeError) as exc:
             errors.append(f"{endpoint}: {exc}")
-            time.sleep(1)
+            time.sleep(0.5)
     raise RuntimeError("Не удалось получить данные из Overpass:\n" + "\n".join(errors))
 
 
