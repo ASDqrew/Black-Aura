@@ -1,8 +1,6 @@
 const header = document.querySelector('[data-header]');
 const menuButton = document.querySelector('[data-menu-button]');
 const menu = document.querySelector('[data-menu]');
-const bookingForm = document.querySelector('[data-booking-form]');
-const formResult = document.querySelector('[data-form-result]');
 
 const closeMenu = () => {
   menu?.classList.remove('is-open');
@@ -38,12 +36,6 @@ const observer = new IntersectionObserver(
 );
 
 document.querySelectorAll('.reveal').forEach((element) => observer.observe(element));
-
-bookingForm?.addEventListener('submit', (event) => {
-  event.preventDefault();
-  formResult.hidden = false;
-  formResult.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-});
 
 document.querySelectorAll('[data-year]').forEach((node) => {
   node.textContent = new Date().getFullYear();

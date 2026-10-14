@@ -1,6 +1,6 @@
 # Alexander Cut — demo website
 
-Static responsive demo for a biowave hairstylist. The page uses clearly marked reference images and placeholder pricing until the client's real materials are provided.
+Static responsive demo for a biowave hairstylist. The page uses clearly marked reference images and links to the current YCLIENTS pricing and booking flow.
 
 ## Run locally
 
@@ -12,6 +12,6 @@ Open `http://localhost:4173`.
 
 ## Replace demo content
 
-- Replace files in `assets/` with Alexander's approved photos.
-- Update prices in the `#price` section of `index.html`.
-- Connect the booking form only after the final booking workflow and privacy requirements are agreed.
+- Replace the reference images in `assets/` with Alexander's approved watermark-free work.
+- Replace the YCLIENTS link if Alexander's booking address changes.
+- The current booking flow uses YCLIENTS, followed by photos, prepayment, and receipt confirmation with the administrator.

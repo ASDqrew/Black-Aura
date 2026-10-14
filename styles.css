@@ -766,62 +766,53 @@ input {
   background: var(--paper);
 }
 
-.booking-form fieldset {
-  margin: 0 0 42px;
-  padding: 0;
-  border: 0;
-}
-
-.booking-form legend {
-  width: 100%;
-  margin-bottom: 18px;
-  font-size: 14px;
-  font-weight: 700;
-  text-transform: uppercase;
-}
-
-.booking-form legend span {
-  margin-right: 14px;
+.booking-flow-kicker {
+  margin: 0 0 18px;
   color: var(--orange);
   font-size: 10px;
-}
-
-.choice-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 9px;
-}
-
-.choice-grid-three {
-  grid-template-columns: repeat(3, 1fr);
-}
-
-.choice-grid label {
-  cursor: pointer;
-}
-
-.choice-grid input {
-  position: absolute;
-  opacity: 0;
-}
-
-.choice-grid label span {
-  min-height: 52px;
-  padding: 12px;
-  display: grid;
-  place-items: center;
-  border: 1px solid var(--line);
-  font-size: 11px;
   font-weight: 700;
-  text-align: center;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  transition: background 0.2s ease, border-color 0.2s ease;
 }
 
-.choice-grid input:checked + span {
-  color: var(--paper);
-  background: var(--ink);
-  border-color: var(--ink);
+.booking-steps {
+  margin: 0 0 34px;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--line);
+}
+
+.booking-steps li {
+  min-height: 92px;
+  padding: 22px 0;
+  display: grid;
+  grid-template-columns: 36px 1fr;
+  gap: 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.booking-steps > li > span {
+  padding-top: 3px;
+  color: var(--orange);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.booking-steps h3 {
+  margin: 0;
+  font-size: 14px;
+  text-transform: uppercase;
+}
+
+.booking-steps p {
+  margin: 7px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.booking-cta {
+  width: 100%;
 }
 
 .form-note {
@@ -829,39 +820,6 @@ input {
   color: var(--muted);
   font-size: 10px;
   text-align: center;
-}
-
-.form-result {
-  margin-top: 22px;
-  padding: 18px;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  border: 1px solid var(--ink);
-}
-
-.form-result[hidden] {
-  display: none;
-}
-
-.form-result > span {
-  width: 36px;
-  height: 36px;
-  display: grid;
-  place-items: center;
-  background: var(--lime);
-  border-radius: 50%;
-}
-
-.form-result strong {
-  font-size: 12px;
-  text-transform: uppercase;
-}
-
-.form-result p {
-  margin: 4px 0 0;
-  color: var(--muted);
-  font-size: 12px;
 }
 
 .faq {
@@ -1115,9 +1073,6 @@ footer {
   .booking { padding: 88px 16px; gap: 58px; }
   .booking-contact { margin-top: 45px; }
   .booking-form { padding: 25px 18px; }
-  .choice-grid, .choice-grid-three { grid-template-columns: 1fr 1fr; }
-  .choice-grid-three label:last-child { grid-column: 1 / -1; }
-
   .faq { gap: 52px; }
   .faq-list summary { min-height: 76px; font-size: 12px; }
 
