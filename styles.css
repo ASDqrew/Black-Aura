@@ -446,7 +446,7 @@ input {
 .section {
   width: var(--page);
   margin: 0 auto;
-  padding: clamp(100px, 11vw, 180px) 0;
+  padding: clamp(96px, 9vw, 150px) 0;
 }
 
 .section-heading {
@@ -474,19 +474,16 @@ input {
 }
 
 .work-grid {
-  margin-top: 90px;
+  width: min(1040px, 100%);
+  margin: 76px auto 0;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: clamp(18px, 2.5vw, 40px);
+  grid-template-columns: repeat(2, 1fr);
+  gap: clamp(24px, 4vw, 64px);
   align-items: start;
 }
 
 .work-card:nth-child(2) {
-  margin-top: 120px;
-}
-
-.work-card-offset {
-  margin-top: 45px;
+  margin-top: 72px;
 }
 
 .work-image {
@@ -494,10 +491,6 @@ input {
   aspect-ratio: 4 / 5;
   overflow: hidden;
   background: var(--paper-deep);
-}
-
-.work-card-tall .work-image {
-  aspect-ratio: 4 / 5.8;
 }
 
 .work-image img {
@@ -1049,9 +1042,10 @@ footer {
   .section-heading h2 { margin-top: 0; font-size: 47px; }
   .section-heading > div > p { margin-top: 22px; }
 
-  .work-grid { margin-top: 60px; grid-template-columns: 1fr; gap: 58px; }
-  .work-card:nth-child(2), .work-card-offset { margin-top: 0; }
-  .work-card-tall .work-image, .work-image { aspect-ratio: 4 / 5; }
+  .section { padding: 82px 0; }
+  .work-grid { margin-top: 52px; grid-template-columns: 1fr; gap: 48px; }
+  .work-card:nth-child(2) { margin-top: 0; }
+  .work-image { aspect-ratio: 4 / 5; }
   .material-note { margin-top: 54px; display: block; }
   .material-note span { margin-right: 8px; }
   .material-note a { margin: 10px 0 0; display: block; }
