@@ -457,14 +457,6 @@ input {
   align-items: start;
 }
 
-.work-card:nth-child(2) {
-  margin-top: 72px;
-}
-
-.work-card:nth-child(3) {
-  margin-top: 28px;
-}
-
 .work-image {
   position: relative;
   aspect-ratio: 4 / 5;
@@ -472,20 +464,28 @@ input {
   background: var(--paper-deep);
 }
 
+.work-image::after {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  inset: 46% 0 0;
+  background: linear-gradient(to bottom, transparent, rgba(16, 17, 15, 0.78));
+  pointer-events: none;
+}
+
 .work-image img {
   height: 100%;
   object-fit: cover;
-  filter: saturate(0.88);
-  transition: transform 0.7s ease, filter 0.7s ease;
+  transition: transform 0.7s ease;
 }
 
 .work-card:hover .work-image img {
-  transform: scale(1.035);
-  filter: saturate(1);
+  transform: scale(1.025);
 }
 
 .work-image > span {
   position: absolute;
+  z-index: 2;
   top: 14px;
   left: 14px;
   padding: 8px 10px;
@@ -494,6 +494,36 @@ input {
   backdrop-filter: blur(8px);
   font-size: 9px;
   letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.work-image-type {
+  position: absolute;
+  z-index: 2;
+  right: 18px;
+  bottom: 18px;
+  left: 18px;
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+  color: var(--paper);
+}
+
+.work-image-type strong {
+  max-width: 200px;
+  font-size: clamp(20px, 2vw, 30px);
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
+}
+
+.work-image-type small {
+  max-width: 95px;
+  font-size: 9px;
+  line-height: 1.35;
+  letter-spacing: 0.08em;
+  text-align: right;
   text-transform: uppercase;
 }
 
@@ -515,6 +545,35 @@ input {
   color: var(--muted);
   font-size: 13px;
   line-height: 1.5;
+}
+
+.work-traits {
+  margin: 20px 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  list-style: none;
+}
+
+.work-traits li {
+  padding-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border-top: 1px solid var(--line);
+  font-size: 10px;
+  text-transform: uppercase;
+}
+
+.work-traits span {
+  color: var(--muted);
+  letter-spacing: 0.08em;
+}
+
+.work-traits strong {
+  font-size: 11px;
+  font-weight: 700;
 }
 
 .work-meta b {
