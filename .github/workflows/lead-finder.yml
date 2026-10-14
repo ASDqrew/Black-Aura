@@ -1,0 +1,55 @@
+name: Beauty Lead Finder
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "tools/lead_finder/**"
+      - ".github/workflows/lead-finder.yml"
+  schedule:
+    # 12:00 Asia/Yekaterinburg, Monday through Friday.
+    - cron: "0 7 * * 1-5"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  find-leads:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Find and rank Moscow beauty leads
+        run: >-
+          python3 tools/lead_finder/lead_finder.py
+          --min-score 50
+          --limit 100
+          --output-dir lead-output
+
+      - name: Add run summary
+        run: |
+          python3 - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import csv
+          from collections import Counter
+          with open("lead-output/leads.csv", encoding="utf-8-sig") as handle:
+              rows = list(csv.DictReader(handle))
+          counts = Counter(row["priority"] for row in rows)
+          print("## Beauty Lead Finder")
+          print(f"Найдено лидов: **{len(rows)}**")
+          print(f"Приоритет A: **{counts['A']}**, B: **{counts['B']}**, C: **{counts['C']}**")
+          print("Скачайте artifact `beauty-leads-moscow`: внутри таблица CSV и HTML-отчёт с готовыми сообщениями.")
+          PY
+
+      - name: Upload lead report
+        uses: actions/upload-artifact@v4
+        with:
+          name: beauty-leads-moscow
+          path: lead-output/
+          retention-days: 7
+

@@ -1,0 +1,56 @@
+{
+  "elements": [
+    {
+      "type": "node",
+      "id": 101,
+      "tags": {
+        "name": "Curl Lab Moscow",
+        "shop": "hairdresser",
+        "beauty": "hair",
+        "addr:street": "Ходынский бульвар",
+        "addr:housenumber": "20А",
+        "contact:phone": "+7 900 000-00-01",
+        "contact:instagram": "@curl_lab_moscow",
+        "contact:website": "https://n123456.yclients.com/"
+      }
+    },
+    {
+      "type": "node",
+      "id": 102,
+      "tags": {
+        "name": "Brow Place",
+        "shop": "beauty",
+        "beauty": "eyebrows",
+        "addr:street": "Лесная улица",
+        "addr:housenumber": "7",
+        "phone": "+7 900 000-00-02",
+        "website": "https://vk.com/brow_place"
+      }
+    },
+    {
+      "type": "way",
+      "id": 103,
+      "tags": {
+        "name": "Studio With Site",
+        "shop": "beauty",
+        "beauty": "nails",
+        "addr:street": "Тверская улица",
+        "addr:housenumber": "15",
+        "phone": "+7 900 000-00-03",
+        "website": "https://studio-with-site.example/"
+      }
+    },
+    {
+      "type": "node",
+      "id": 104,
+      "tags": {
+        "name": "Lash Room",
+        "shop": "beauty",
+        "beauty": "lashes",
+        "addr:street": "Мясницкая улица",
+        "addr:housenumber": "11",
+        "contact:telegram": "@lash_room_msk"
+      }
+    }
+  ]
+}
