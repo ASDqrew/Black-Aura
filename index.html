@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#161815" />
+    <meta
+      name="description"
+      content="Alexander Cut — биозавивка и персональная форма локона. Демонстрационная концепция сайта мастера."
+    />
+    <meta property="og:title" content="Alexander Cut — биозавивка с характером" />
+    <meta
+      property="og:description"
+      content="Персональная форма локона, понятный результат и удобная онлайн-запись."
+    />
+    <title>Alexander Cut — биозавивка с характером</title>
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+    <link rel="preload" href="assets/hero.webp" as="image" type="image/webp" />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="app.js" defer></script>
+  </head>
+
+  <body>
+    <div class="demo-strip">
+      <span>Демо-концепция</span>
+      <p>Фотографии и цены будут заменены на материалы мастера</p>
+    </div>
+
+    <header class="site-header" data-header>
+      <a class="brand" href="#top" aria-label="Alexander Cut — на главную">
+        <span class="brand-mark">A<span>/</span>C</span>
+        <span class="brand-name">Alexander<br />Cut</span>
+      </a>
+
+      <button class="menu-button" type="button" aria-expanded="false" aria-controls="main-menu" data-menu-button>
+        <span></span><span></span>
+        <span class="sr-only">Открыть меню</span>
+      </button>
+
+      <nav class="main-menu" id="main-menu" data-menu>
+        <a href="#works">Результаты</a>
+        <a href="#process">Как проходит</a>
+        <a href="#price">Стоимость</a>
+        <a class="nav-book" href="#booking">Записаться <span>↗</span></a>
+      </nav>
+    </header>
+
+    <main id="top">
+      <section class="hero">
+        <div class="hero-copy reveal">
+          <p class="eyebrow"><span></span> Биозавивка · персональная форма</p>
+          <h1>Локоны,<br />которые выглядят<br /><em>как твои</em></h1>
+          <p class="hero-lead">
+            Подбираю форму и выраженность завитка под твои волосы, привычный образ и то, как ты хочешь выглядеть каждый день.
+          </p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="#booking">Подобрать завивку <span>↗</span></a>
+            <a class="text-link" href="#works">Смотреть варианты <span>↓</span></a>
+          </div>
+          <div class="hero-facts" aria-label="Преимущества">
+            <p><strong>01</strong> Форма под тебя</p>
+            <p><strong>02</strong> Понятный уход</p>
+            <p><strong>03</strong> Запись онлайн</p>
+          </div>
+        </div>
+
+        <div class="hero-visual reveal reveal-delay">
+          <div class="hero-image-wrap">
+            <img src="assets/hero.webp" alt="Пример мягких естественных локонов" />
+            <span class="image-label">Soft texture · 01</span>
+          </div>
+          <div class="roundel" aria-hidden="true">
+            <svg viewBox="0 0 120 120">
+              <defs>
+                <path id="circlePath" d="M60,60 m-43,0 a43,43 0 1,1 86,0 a43,43 0 1,1 -86,0" />
+              </defs>
+              <text><textPath href="#circlePath">ALEXANDER CUT · BIO WAVE · </textPath></text>
+            </svg>
+            <span>AC</span>
+          </div>
+          <p class="vertical-word" aria-hidden="true">TEXTURE</p>
+        </div>
+      </section>
+
+      <div class="ticker" aria-label="Специализация">
+        <div>
+          <span>Форма</span><i>✦</i><span>Текстура</span><i>✦</i><span>Движение</span><i>✦</i><span>Характер</span><i>✦</i><span>Локоны</span>
+        </div>
+      </div>
+
+      <section class="section works" id="works">
+        <div class="section-heading reveal">
+          <p class="section-index">01 / Результат</p>
+          <div>
+            <h2>Не одна завивка<br />для всех. <em>Твоя.</em></h2>
+            <p>Выбираем не картинку из каталога, а характер текстуры, который подходит именно тебе.</p>
+          </div>
+        </div>
+
+        <div class="work-grid">
+          <article class="work-card work-card-tall reveal">
+            <div class="work-image">
+              <img src="assets/soft-wave.webp" alt="Референс мягкой волны" />
+              <span>Референс для демо</span>
+            </div>
+            <div class="work-meta">
+              <h3>Мягкая волна</h3>
+              <p>Живое движение и лёгкий объём без ощущения жёсткой укладки.</p>
+              <b>01</b>
+            </div>
+          </article>
+
+          <article class="work-card reveal reveal-delay">
+            <div class="work-image">
+              <img src="assets/defined-curl.webp" alt="Референс выраженного завитка" />
+              <span>Референс для демо</span>
+            </div>
+            <div class="work-meta">
+              <h3>Выраженный завиток</h3>
+              <p>Чёткая форма, плотная текстура и акцентный силуэт.</p>
+              <b>02</b>
+            </div>
+          </article>
+
+          <article class="work-card work-card-offset reveal">
+            <div class="work-image">
+              <img src="assets/air-volume.webp" alt="Референс воздушного объёма" />
+              <span>Референс для демо</span>
+            </div>
+            <div class="work-meta">
+              <h3>Воздух и объём</h3>
+              <p>Подвижные локоны и объём, который не требует сложной укладки.</p>
+              <b>03</b>
+            </div>
+          </article>
+        </div>
+
+        <p class="material-note reveal">
+          <span>Важно</span> В финальной версии здесь будут реальные работы Александра из TikTok
+          <a href="https://www.tiktok.com/@alexandr.cut" target="_blank" rel="noreferrer">@alexandr.cut ↗</a>
+        </p>
+      </section>
+
+      <section class="statement">
+        <div class="statement-mark">“</div>
+        <p class="reveal">Хорошая завивка меняет не только волосы. Она даёт форму образу и освобождает утро от долгой укладки.</p>
+        <span>Alexander Cut · подход к работе</span>
+      </section>
+
+      <section class="section process" id="process">
+        <div class="section-heading section-heading-light reveal">
+          <p class="section-index">02 / Процесс</p>
+          <div>
+            <h2>От идеи<br />до <em>твоей формы</em></h2>
+            <p>До начала процедуры ты понимаешь, что мы делаем, какой результат реалистичен и как сохранить его дома.</p>
+          </div>
+        </div>
+
+        <ol class="process-list">
+          <li class="reveal">
+            <span>01</span>
+            <div><h3>Знакомимся</h3><p>Смотри фотографии, рассказываешь, что нравится, и показываешь текущее состояние волос.</p></div>
+            <i>10 минут</i>
+          </li>
+          <li class="reveal">
+            <span>02</span>
+            <div><h3>Выбираем форму</h3><p>Определяем размер завитка, объём и силуэт с учётом длины и структуры волос.</p></div>
+            <i>Персонально</i>
+          </li>
+          <li class="reveal">
+            <span>03</span>
+            <div><h3>Создаём текстуру</h3><p>Проводим процедуру и формируем результат, который будет естественно отрастать.</p></div>
+            <i>По записи</i>
+          </li>
+          <li class="reveal">
+            <span>04</span>
+            <div><h3>Разбираем уход</h3><p>Показываю простую укладку и объясняю, что использовать дома для сохранения формы.</p></div>
+            <i>Без догадок</i>
+          </li>
+        </ol>
+      </section>
+
+      <section class="section price" id="price">
+        <div class="price-copy reveal">
+          <p class="section-index">03 / Стоимость</p>
+          <h2>Цена зависит<br />от длины и задачи</h2>
+          <p>
+            До записи можно отправить фото волос и желаемого результата. Александр оценит работу и назовёт стоимость заранее.
+          </p>
+          <a class="button button-dark" href="#booking">Узнать стоимость <span>↗</span></a>
+        </div>
+
+        <div class="price-list reveal reveal-delay">
+          <article>
+            <span>01</span>
+            <div><h3>Короткая длина</h3><p>Лёгкая текстура или выраженный завиток</p></div>
+            <strong>по прайсу</strong>
+          </article>
+          <article>
+            <span>02</span>
+            <div><h3>Средняя длина</h3><p>Форма, объём и подбор размера локона</p></div>
+            <strong>по прайсу</strong>
+          </article>
+          <article>
+            <span>03</span>
+            <div><h3>Длинные волосы</h3><p>Индивидуальный расчёт состава и времени</p></div>
+            <strong>по прайсу</strong>
+          </article>
+          <p class="price-placeholder">Актуальные суммы появятся после подтверждения Александра.</p>
+        </div>
+      </section>
+
+      <section class="booking" id="booking">
+        <div class="booking-intro reveal">
+          <p class="section-index">04 / Запись</p>
+          <h2>Начнём<br />с твоих волос</h2>
+          <p>Выбери желаемый результат. В рабочей версии Александр получит заявку и ответит в Telegram.</p>
+          <div class="booking-contact">
+            <span>Смотреть работы</span>
+            <a href="https://www.tiktok.com/@alexandr.cut" target="_blank" rel="noreferrer">TikTok · @alexandr.cut ↗</a>
+          </div>
+        </div>
+
+        <form class="booking-form reveal reveal-delay" data-booking-form>
+          <fieldset>
+            <legend><span>01</span> Какой результат нравится?</legend>
+            <div class="choice-grid">
+              <label><input type="radio" name="result" value="Мягкая волна" checked /><span>Мягкая волна</span></label>
+              <label><input type="radio" name="result" value="Выраженный завиток" /><span>Выраженный завиток</span></label>
+              <label><input type="radio" name="result" value="Объём и текстура" /><span>Объём и текстура</span></label>
+              <label><input type="radio" name="result" value="Нужен совет" /><span>Нужен совет</span></label>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend><span>02</span> Какая сейчас длина?</legend>
+            <div class="choice-grid choice-grid-three">
+              <label><input type="radio" name="length" value="Короткая" checked /><span>Короткая</span></label>
+              <label><input type="radio" name="length" value="Средняя" /><span>Средняя</span></label>
+              <label><input type="radio" name="length" value="Длинная" /><span>Длинная</span></label>
+            </div>
+          </fieldset>
+
+          <button class="button button-lime" type="submit">Продолжить запись <span>↗</span></button>
+          <p class="form-note">Это демонстрация интерфейса: данные никуда не отправляются.</p>
+
+          <div class="form-result" role="status" aria-live="polite" data-form-result hidden>
+            <span>✓</span>
+            <div><strong>Выбор сохранён в демо</strong><p>В готовом сайте здесь откроется выбор даты и времени.</p></div>
+          </div>
+        </form>
+      </section>
+
+      <section class="section faq">
+        <div class="faq-title reveal">
+          <p class="section-index">05 / Вопросы</p>
+          <h2>Перед<br />записью</h2>
+        </div>
+        <div class="faq-list reveal">
+          <details>
+            <summary>Подойдёт ли биозавивка моим волосам?<span>+</span></summary>
+            <p>Это зависит от длины, состояния и прошлых процедур. Перед записью лучше отправить актуальное фото волос без укладки.</p>
+          </details>
+          <details>
+            <summary>Сколько держится результат?<span>+</span></summary>
+            <p>Срок зависит от структуры волос, выбранной формы и домашнего ухода. Точный ориентир мастер даст после консультации.</p>
+          </details>
+          <details>
+            <summary>Нужно ли укладывать локоны каждый день?<span>+</span></summary>
+            <p>Сложная укладка не нужна. Александр покажет базовый способ сушки и подберёт простой домашний уход.</p>
+          </details>
+          <details>
+            <summary>Можно сразу узнать точную стоимость?<span>+</span></summary>
+            <p>Да. После фотографии и короткого описания желаемого результата мастер сможет заранее оценить объём работы.</p>
+          </details>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="footer-brand">Alexander <em>Cut</em></div>
+      <div class="footer-row">
+        <p>Биозавивка · персональная текстура</p>
+        <a href="https://www.tiktok.com/@alexandr.cut" target="_blank" rel="noreferrer">@alexandr.cut ↗</a>
+        <p>Демо-концепция · <span data-year></span></p>
+      </div>
+    </footer>
+
+    <a class="mobile-book" href="#booking"><span>Записаться</span><i>↗</i></a>
+  </body>
+</html>
