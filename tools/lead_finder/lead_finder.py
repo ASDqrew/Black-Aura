@@ -510,6 +510,9 @@ def main() -> int:
             report.write_text(content.replace("<h1>", f"<p><strong>Источники недоступны. Сохранённая база от {html.escape(status['fetched_at'])}. Данные не обновлены.</strong></p><h1>", 1), encoding="utf-8")
     except (OSError, ValueError, RuntimeError, json.JSONDecodeError) as exc:
         print(f"Ошибка: {exc}", file=sys.stderr)
+        if os.environ.get("GITHUB_ACTIONS") == "true":
+            annotation = str(exc).replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
+            print(f"::error title=Lead search source failure::{annotation}")
         return 1
     print(f"Готово: {len(leads)} лидов")
     print(f"CSV: {(args.output_dir / 'leads.csv').resolve()}")
