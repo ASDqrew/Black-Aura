@@ -25,7 +25,6 @@ from urllib.parse import urlparse
 MOSCOW_BBOX = "55.489,37.205,56.009,37.967"
 DEFAULT_OVERPASS_URLS = (
     "https://maps.mail.ru/osm/tools/overpass/api/interpreter",
-    "https://overpass.osm.jp/api/interpreter",
     "https://lz4.overpass-api.de/api/interpreter",
     "https://overpass.private.coffee/api/interpreter",
     "https://overpass.kumi.systems/api/interpreter",
