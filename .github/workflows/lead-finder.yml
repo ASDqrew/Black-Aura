@@ -33,13 +33,24 @@ jobs:
           restore-keys: beauty-source-
 
       - name: Find and rank Moscow beauty leads
-        run: >-
-          python3 tools/lead_finder/lead_finder.py
-          --research tools/lead_finder/research.json
-          --cache .lead-cache/moscow.json
-          --min-score 50
-          --limit 100
-          --output-dir lead-output
+        shell: bash
+        run: |
+          set -o pipefail
+          mkdir -p lead-output
+          python3 tools/lead_finder/lead_finder.py \
+            --research tools/lead_finder/research.json \
+            --cache .lead-cache/moscow.json \
+            --min-score 50 --limit 100 \
+            --output-dir lead-output 2>&1 | tee lead-output/search.log
+
+      - name: Upload search diagnostics on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lead-search-error
+          path: lead-output/search.log
+          if-no-files-found: ignore
+          retention-days: 7
 
       - name: Save successful database
         uses: actions/cache/save@v4

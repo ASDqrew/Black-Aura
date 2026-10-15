@@ -23,6 +23,8 @@ from urllib.parse import urlparse
 
 MOSCOW_BBOX = "55.489,37.205,56.009,37.967"
 DEFAULT_OVERPASS_URLS = (
+    "https://maps.mail.ru/osm/tools/overpass/api/interpreter",
+    "https://overpass.osm.jp/api/interpreter",
     "https://lz4.overpass-api.de/api/interpreter",
     "https://overpass.private.coffee/api/interpreter",
     "https://overpass.kumi.systems/api/interpreter",
@@ -343,6 +345,12 @@ def fetch_overpass(bbox: str, endpoints: Iterable[str] = DEFAULT_OVERPASS_URLS) 
                 if payload.get("remark"):
                     raise ValueError(str(payload["remark"]))
                 return payload
+        except urllib.error.HTTPError as exc:
+            detail = re.sub(r"<[^>]*>", " ", exc.read(3000).decode("utf-8", errors="replace"))
+            detail = " ".join(detail.split())[:600]
+            errors.append(f"{endpoint}: HTTP {exc.code}: {detail}")
+            print(errors[-1], file=sys.stderr, flush=True)
+            time.sleep(2)
         except (urllib.error.URLError, TimeoutError, ValueError) as exc:
             errors.append(f"{endpoint}: {exc}")
             print(f"Источник недоступен: {exc}", file=sys.stderr, flush=True)
