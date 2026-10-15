@@ -104,6 +104,8 @@ class Lead:
     priority: str = ""
     reasons: list[str] = field(default_factory=list)
     message: str = ""
+    research_status: str = "Нужен просмотр страницы"
+    research_source: str = ""
 
 
 def hostname(value: str) -> str:
@@ -203,7 +205,7 @@ def score_lead(lead: Lead) -> Lead:
     reasons: list[str] = []
     if not lead.website_url:
         score += 35
-        reasons.append("нет полноценного сайта")
+        reasons.append("отдельный сайт не указан в каталоге — проверить")
     else:
         score -= 25
         reasons.append("уже есть отдельный сайт")
@@ -230,25 +232,49 @@ def score_lead(lead: Lead) -> Lead:
 
 
 def make_message(lead: Lead) -> str:
-    name = lead.name.strip() or "вашу страницу"
-    if lead.booking_url:
-        opening = (
-            f"Добрый день! Увидел {name}: у вас уже есть онлайн-запись, "
-            "но перед ней новому клиенту приходится отдельно искать примеры работ, "
-            "стоимость и понимать, какой результат он получит."
+    """A category-based draft, never presented as a researched individual offer."""
+    angles = {
+        "волосами": ("Как клиенту заранее понять, какая форма и текстура ему подойдут?",
+                     "показать разные результаты на ваших работах и объяснить, кому подходит каждый вариант"),
+        "маникюром": ("Как клиенту выбрать покрытие и дизайн до записи?",
+                      "связать ваши работы с услугами, ценами и длительностью записи"),
+        "педикюром": ("Как клиенту заранее разобраться в вариантах процедуры?",
+                      "показать состав каждой услуги и помочь выбрать подходящий вариант записи"),
+        "бровями": ("Как показать клиенту разницу между оформлением, окрашиванием и долговременной укладкой?",
+                    "на ваших примерах объяснить различия и сразу предложить запись на нужную услугу"),
+        "ресницами": ("Как клиентке выбрать эффект, если она не разбирается в изгибах и объёмах?",
+                      "собрать понятное сравнение эффектов на ваших работах и связать их с записью"),
+        "косметологией": ("Как помочь новому клиенту разобраться в процедурах перед консультацией?",
+                          "понятно представить ваши направления и привести человека к записи на консультацию"),
+    }
+    question, idea = angles.get(lead.category, (
+        "Как новому клиенту выбрать подходящую услугу перед записью?",
+        "показать ваши работы рядом с описанием услуг и понятным следующим шагом"))
+    booking = " Можно оставить вашу онлайн-запись." if lead.booking_url else ""
+    return (f"Добрый день! Нашёл «{lead.name}» в каталоге. {question}"
+            f"\n\nЕсть идея {idea}.{booking}"
+            "\n\nВам было бы полезно такое решение? Могу показать небольшой пример.")
+
+
+def apply_research(leads: list[Lead], path: Path) -> None:
+    """Use explicit observations with sources; never invent missing page findings."""
+    profiles = json.loads(path.read_text(encoding="utf-8"))
+    for lead in leads:
+        profile = profiles.get(lead.source_id)
+        if not profile:
+            continue
+        required = ("observation", "source_url", "proposal", "benefit")
+        if any(not isinstance(profile.get(key), str) or not profile[key].strip() for key in required):
+            raise ValueError(f"Для {lead.source_id} нужны observation, source_url, proposal, benefit")
+        if urlparse(profile["source_url"]).scheme not in ("http", "https"):
+            raise ValueError(f"Для {lead.source_id} нужен HTTP(S) источник наблюдения")
+        lead.research_status = "Есть наблюдение — проверить актуальность перед отправкой"
+        lead.research_source = profile["source_url"]
+        lead.message = (
+            f"Добрый день! {profile['observation'].strip()}"
+            f"\n\nПредлагаю {profile['proposal'].strip()} — {profile['benefit'].strip()}"
+            "\n\nПоказать на небольшом примере под вас?"
         )
-    else:
-        opening = (
-            f"Добрый день! Увидел {name} и то, что вы занимаетесь {lead.category}. "
-            "Новому клиенту перед записью важно сразу увидеть примеры работ, цены "
-            "и понять, какой результат он получит."
-        )
-    return (
-        opening
-        + "\n\nМогу сделать для вас компактный сайт с работами, ценами, описанием услуг "
-        "и удобной записью. Его также можно подготовить к поиску в Яндексе по вашим услугам в Москве."
-        + "\n\nЕсли интересно, бесплатно подготовлю небольшой пример под вас. Показать?"
-    )
 
 
 def element_to_lead(element: dict) -> Lead | None:
@@ -346,6 +372,8 @@ def write_csv(leads: list[Lead], path: Path) -> None:
         "source_url",
         "reasons",
         "message",
+        "research_status",
+        "research_source",
     ]
     with path.open("w", newline="", encoding="utf-8-sig") as handle:
         writer = csv.DictWriter(handle, fieldnames=fields)
@@ -384,7 +412,8 @@ def write_html(leads: list[Lead], path: Path) -> None:
             <article class="lead" data-priority="{lead.priority}">
               <header><span class="badge p{lead.priority}">{lead.priority}</span><strong>{lead.score}</strong><h2>{html.escape(lead.name)}</h2></header>
               <p class="meta">{html.escape(lead.category)} · {html.escape(lead.address or 'Москва')}</p>
-              <nav>{links}</nav>
+              <nav>{links} {link(lead.research_source, "Основание оффера")}</nav>
+              <p class="meta">{html.escape(lead.research_status)}</p>
               <ul>{reasons}</ul>
               <div class="message"><button type="button" data-copy="message-{index}">Скопировать сообщение</button><pre id="message-{index}">{html.escape(lead.message)}</pre></div>
             </article>"""
@@ -419,6 +448,7 @@ document.querySelectorAll('[data-copy]').forEach(b=>b.onclick=async()=>{{await n
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Поиск бьюти-лидов Москвы без полноценного сайта")
     parser.add_argument("--input", type=Path, help="Локальный JSON Overpass для повторного анализа")
+    parser.add_argument("--research", type=Path, help="JSON с проверенными наблюдениями по source_id")
     parser.add_argument("--bbox", default=MOSCOW_BBOX, help="Границы south,west,north,east")
     parser.add_argument("--min-score", type=int, default=50, help="Минимальный балл лида")
     parser.add_argument("--limit", type=int, default=100, help="Максимум лидов в отчёте")
@@ -431,6 +461,8 @@ def main() -> int:
     try:
         payload = load_payload(args.input, args.bbox)
         leads = leads_from_payload(payload, args.min_score)[: max(0, args.limit)]
+        if args.research:
+            apply_research(leads, args.research)
         write_csv(leads, args.output_dir / "leads.csv")
         write_html(leads, args.output_dir / "leads.html")
     except (OSError, ValueError, RuntimeError, json.JSONDecodeError) as exc:

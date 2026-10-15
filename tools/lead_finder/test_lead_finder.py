@@ -1,4 +1,5 @@
 import csv
+import json
 import importlib.util
 import sys
 import tempfile
@@ -15,6 +16,32 @@ SPEC.loader.exec_module(MODULE)
 
 
 class LeadFinderTests(unittest.TestCase):
+    def test_unresearched_drafts_do_not_invent_page_problems(self):
+        payload = MODULE.load_payload(ROOT / "fixtures" / "overpass_sample.json", MODULE.MOSCOW_BBOX)
+        leads = MODULE.leads_from_payload(payload, 50)
+        self.assertIn("форма и текстура", leads[0].message)
+        self.assertIn("оформлением, окрашиванием", leads[1].message)
+        self.assertIn("изгибах и объёмах", leads[2].message)
+        for lead in leads:
+            self.assertEqual(lead.research_status, "Нужен просмотр страницы")
+            self.assertNotIn("приходится отдельно искать", lead.message)
+
+    def test_research_requires_evidence_and_changes_offer(self):
+        payload = MODULE.load_payload(ROOT / "fixtures" / "overpass_sample.json", MODULE.MOSCOW_BBOX)
+        leads = MODULE.leads_from_payload(payload, 50)
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "research.json"
+            profile = {"observation": "Вы предлагаете две техники.", "proposal": "сравнить техники", "benefit": "помочь выбрать услугу"}
+            path.write_text(json.dumps({leads[0].source_id: profile}))
+            with self.assertRaises(ValueError):
+                MODULE.apply_research(leads, path)
+            profile["source_url"] = "https://example.com/services"
+            path.write_text(json.dumps({leads[0].source_id: profile}))
+            MODULE.apply_research(leads, path)
+            self.assertIn("Вы предлагаете две техники.", leads[0].message)
+            self.assertEqual(leads[0].research_source, profile["source_url"])
+            self.assertEqual(leads[1].research_status, "Нужен просмотр страницы")
+
     def test_booking_link_is_not_treated_as_standalone_site(self):
         lead = MODULE.element_to_lead(
             {

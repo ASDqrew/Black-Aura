@@ -28,6 +28,7 @@ jobs:
       - name: Find and rank Moscow beauty leads
         run: >-
           python3 tools/lead_finder/lead_finder.py
+          --research tools/lead_finder/research.json
           --min-score 50
           --limit 100
           --output-dir lead-output
