@@ -4,6 +4,7 @@ import importlib.util
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 
 
@@ -16,6 +17,21 @@ SPEC.loader.exec_module(MODULE)
 
 
 class LeadFinderTests(unittest.TestCase):
+    def test_outage_uses_only_matching_saved_database(self):
+        with tempfile.TemporaryDirectory() as directory:
+            cache = Path(directory) / "moscow.json"
+            payload = {"elements": [{"type": "node", "id": 1, "tags": {"name": "Example"}}]}
+            with patch.object(MODULE, "fetch_overpass", return_value=payload):
+                fresh = MODULE.load_payload(None, MODULE.MOSCOW_BBOX, cache)
+            self.assertEqual(fresh["lead_finder_status"], "live")
+            with patch.object(MODULE, "fetch_overpass", side_effect=RuntimeError("outage")):
+                saved = MODULE.load_payload(None, MODULE.MOSCOW_BBOX, cache)
+                self.assertEqual(saved["lead_finder_status"], "cache")
+                with self.assertRaises(ValueError):
+                    MODULE.load_payload(None, "1,2,3,4", cache)
+                with self.assertRaises(RuntimeError):
+                    MODULE.load_payload(None, MODULE.MOSCOW_BBOX, Path(directory) / "missing.json")
+
     def test_unresearched_drafts_do_not_invent_page_problems(self):
         payload = MODULE.load_payload(ROOT / "fixtures" / "overpass_sample.json", MODULE.MOSCOW_BBOX)
         leads = MODULE.leads_from_payload(payload, 50)

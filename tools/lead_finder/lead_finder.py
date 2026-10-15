@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+from datetime import datetime, timezone
 import html
 import json
 import os
@@ -325,7 +326,7 @@ out tags;"""
 def fetch_overpass(bbox: str, endpoints: Iterable[str] = DEFAULT_OVERPASS_URLS) -> dict:
     query_string = urllib.parse.urlencode({"data": overpass_query(bbox)})
     errors: list[str] = []
-    for endpoint in endpoints:
+    for endpoint in list(endpoints) * 2:
         print(f"Пробую источник: {endpoint}", file=sys.stderr, flush=True)
         request = urllib.request.Request(
             endpoint + "?" + query_string,
@@ -336,20 +337,47 @@ def fetch_overpass(bbox: str, endpoints: Iterable[str] = DEFAULT_OVERPASS_URLS) 
         )
         try:
             with urllib.request.urlopen(request, timeout=30) as response:
-                return json.load(response)
-        except (urllib.error.URLError, TimeoutError, json.JSONDecodeError) as exc:
+                payload = json.load(response)
+                if not isinstance(payload, dict) or not isinstance(payload.get("elements"), list):
+                    raise ValueError("Некорректный ответ Overpass")
+                if payload.get("remark"):
+                    raise ValueError(str(payload["remark"]))
+                return payload
+        except (urllib.error.URLError, TimeoutError, ValueError) as exc:
             errors.append(f"{endpoint}: {exc}")
-            time.sleep(0.5)
+            print(f"Источник недоступен: {exc}", file=sys.stderr, flush=True)
+            time.sleep(2)
     raise RuntimeError("Не удалось получить данные из Overpass:\n" + "\n".join(errors))
 
 
-def load_payload(path: Path | None, bbox: str) -> dict:
+def load_payload(path: Path | None, bbox: str, cache: Path | None = None) -> dict:
     if path:
         with path.open(encoding="utf-8") as handle:
             return json.load(handle)
     custom = os.environ.get("OVERPASS_URL", "").strip()
     endpoints = (custom,) if custom else DEFAULT_OVERPASS_URLS
-    return fetch_overpass(bbox, endpoints)
+    try:
+        payload = fetch_overpass(bbox, endpoints)
+    except RuntimeError:
+        if not cache or not cache.exists():
+            raise
+        saved = json.loads(cache.read_text(encoding="utf-8"))
+        if saved.get("bbox") != bbox or not isinstance(saved.get("payload", {}).get("elements"), list):
+            raise ValueError("Сохранённая база не подходит для выбранного города")
+        payload = saved["payload"]
+        payload["lead_finder_status"] = "cache"
+        payload["lead_finder_fetched_at"] = saved["fetched_at"]
+        print(f"ВНИМАНИЕ: источники недоступны; используется база от {saved['fetched_at']}", file=sys.stderr)
+        return payload
+    fetched_at = datetime.now(timezone.utc).isoformat()
+    payload["lead_finder_status"] = "live"
+    payload["lead_finder_fetched_at"] = fetched_at
+    if cache:
+        cache.parent.mkdir(parents=True, exist_ok=True)
+        temporary = cache.with_suffix(".tmp")
+        temporary.write_text(json.dumps({"bbox": bbox, "fetched_at": fetched_at, "payload": payload}, ensure_ascii=False), encoding="utf-8")
+        temporary.replace(cache)
+    return payload
 
 
 def leads_from_payload(payload: dict, minimum_score: int) -> list[Lead]:
@@ -448,6 +476,7 @@ document.querySelectorAll('[data-copy]').forEach(b=>b.onclick=async()=>{{await n
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Поиск бьюти-лидов Москвы без полноценного сайта")
     parser.add_argument("--input", type=Path, help="Локальный JSON Overpass для повторного анализа")
+    parser.add_argument("--cache", type=Path, help="Сохранить успешную базу и использовать при сбое источников")
     parser.add_argument("--research", type=Path, help="JSON с проверенными наблюдениями по source_id")
     parser.add_argument("--bbox", default=MOSCOW_BBOX, help="Границы south,west,north,east")
     parser.add_argument("--min-score", type=int, default=50, help="Минимальный балл лида")
@@ -459,12 +488,18 @@ def parse_args() -> argparse.Namespace:
 def main() -> int:
     args = parse_args()
     try:
-        payload = load_payload(args.input, args.bbox)
+        payload = load_payload(args.input, args.bbox, args.cache)
         leads = leads_from_payload(payload, args.min_score)[: max(0, args.limit)]
         if args.research:
             apply_research(leads, args.research)
         write_csv(leads, args.output_dir / "leads.csv")
         write_html(leads, args.output_dir / "leads.html")
+        status = {"source": payload.get("lead_finder_status", "input"), "fetched_at": payload.get("lead_finder_fetched_at"), "count": len(leads)}
+        (args.output_dir / "status.json").write_text(json.dumps(status, ensure_ascii=False, indent=2), encoding="utf-8")
+        if status["source"] == "cache":
+            report = args.output_dir / "leads.html"
+            content = report.read_text(encoding="utf-8")
+            report.write_text(content.replace("<h1>", f"<p><strong>Источники недоступны. Сохранённая база от {html.escape(status['fetched_at'])}. Данные не обновлены.</strong></p><h1>", 1), encoding="utf-8")
     except (OSError, ValueError, RuntimeError, json.JSONDecodeError) as exc:
         print(f"Ошибка: {exc}", file=sys.stderr)
         return 1
