@@ -11,6 +11,7 @@ import json
 import os
 import re
 import sys
+import tempfile
 import time
 import urllib.error
 import urllib.parse
@@ -358,6 +359,42 @@ def fetch_overpass(bbox: str, endpoints: Iterable[str] = DEFAULT_OVERPASS_URLS) 
     raise RuntimeError("Не удалось получить данные из Overpass:\n" + "\n".join(errors))
 
 
+def fetch_city_extract(bbox: str) -> dict:
+    """Read an independent city extract when interactive Overpass servers fail."""
+    try:
+        import osmium
+    except ImportError as exc:
+        raise RuntimeError("Для резервной выгрузки установите osmium: python3 -m pip install osmium==4.1.1") from exc
+    south, west, north, east = map(float, bbox.split(","))
+    elements = []
+
+    class BeautyNodes(osmium.SimpleHandler):
+        def node(self, node):
+            if not node.location.valid():
+                return
+            if not (south <= node.location.lat <= north and west <= node.location.lon <= east):
+                return
+            tags = dict(node.tags)
+            if tags.get("name") and (tags.get("shop") in ("hairdresser", "beauty") or "beauty" in tags or tags.get("craft") == "beautician"):
+                elements.append({"type": "node", "id": node.id, "tags": tags})
+
+    url = "https://download.bbbike.org/osm/bbbike/Moscow/Moscow.osm.pbf"
+    print(f"Загружаю независимую выгрузку Москвы: {url}", file=sys.stderr, flush=True)
+    with tempfile.TemporaryDirectory() as directory:
+        target = Path(directory) / "moscow.osm.pbf"
+        with urllib.request.urlopen(url, timeout=90) as response, target.open("wb") as output:
+            total = 0
+            while chunk := response.read(1024 * 1024):
+                total += len(chunk)
+                if total > 512 * 1024 * 1024:
+                    raise RuntimeError("Выгрузка превышает лимит 512 МБ")
+                output.write(chunk)
+        BeautyNodes().apply_file(str(target))
+    if not elements:
+        raise RuntimeError("В выгрузке Москвы не найдено бьюти-организаций")
+    return {"elements": elements, "lead_finder_provider": url}
+
+
 def load_payload(path: Path | None, bbox: str, cache: Path | None = None) -> dict:
     if path:
         with path.open(encoding="utf-8") as handle:
@@ -366,7 +403,15 @@ def load_payload(path: Path | None, bbox: str, cache: Path | None = None) -> dic
     endpoints = (custom,) if custom else DEFAULT_OVERPASS_URLS
     try:
         payload = fetch_overpass(bbox, endpoints)
-    except RuntimeError:
+    except RuntimeError as primary_error:
+        try:
+            payload = fetch_city_extract(bbox)
+        except (OSError, RuntimeError) as extract_error:
+            print(f"Резервная выгрузка недоступна: {extract_error}", file=sys.stderr)
+            if not cache or not cache.exists():
+                raise RuntimeError(f"{primary_error}\nРезервная выгрузка: {extract_error}") from extract_error
+        else:
+            return save_payload(payload, bbox, cache)
         if not cache or not cache.exists():
             raise
         saved = json.loads(cache.read_text(encoding="utf-8"))
@@ -377,6 +422,10 @@ def load_payload(path: Path | None, bbox: str, cache: Path | None = None) -> dic
         payload["lead_finder_fetched_at"] = saved["fetched_at"]
         print(f"ВНИМАНИЕ: источники недоступны; используется база от {saved['fetched_at']}", file=sys.stderr)
         return payload
+    return save_payload(payload, bbox, cache)
+
+
+def save_payload(payload: dict, bbox: str, cache: Path | None) -> dict:
     fetched_at = datetime.now(timezone.utc).isoformat()
     payload["lead_finder_status"] = "live"
     payload["lead_finder_fetched_at"] = fetched_at

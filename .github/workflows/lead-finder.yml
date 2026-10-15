@@ -32,6 +32,9 @@ jobs:
           key: beauty-source-${{ github.run_id }}
           restore-keys: beauty-source-
 
+      - name: Install city extract reader
+        run: python3 -m pip install osmium==4.1.1
+
       - name: Find and rank Moscow beauty leads
         shell: bash
         run: |

@@ -1,5 +1,6 @@
 import csv
 import json
+import io
 import importlib.util
 import sys
 import tempfile
@@ -17,6 +18,18 @@ SPEC.loader.exec_module(MODULE)
 
 
 class LeadFinderTests(unittest.TestCase):
+    def test_city_extract_filters_businesses_and_location(self):
+        import osmium
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "sample.osm.pbf"
+            with osmium.SimpleWriter(str(path)) as writer:
+                writer.add_node(osmium.osm.mutable.Node(id=1, location=(37.6, 55.75), tags={"name": "Moscow Beauty", "shop": "beauty"}))
+                writer.add_node(osmium.osm.mutable.Node(id=2, location=(30.3, 59.9), tags={"name": "Other city", "shop": "beauty"}))
+                writer.add_node(osmium.osm.mutable.Node(id=3, location=(37.6, 55.75), tags={"name": "Bakery", "shop": "bakery"}))
+            with patch.object(MODULE.urllib.request, "urlopen", return_value=io.BytesIO(path.read_bytes())):
+                result = MODULE.fetch_city_extract(MODULE.MOSCOW_BBOX)
+            self.assertEqual([item["id"] for item in result["elements"]], [1])
+
     def test_outage_uses_only_matching_saved_database(self):
         with tempfile.TemporaryDirectory() as directory:
             cache = Path(directory) / "moscow.json"
@@ -24,7 +37,7 @@ class LeadFinderTests(unittest.TestCase):
             with patch.object(MODULE, "fetch_overpass", return_value=payload):
                 fresh = MODULE.load_payload(None, MODULE.MOSCOW_BBOX, cache)
             self.assertEqual(fresh["lead_finder_status"], "live")
-            with patch.object(MODULE, "fetch_overpass", side_effect=RuntimeError("outage")):
+            with patch.object(MODULE, "fetch_overpass", side_effect=RuntimeError("outage")), patch.object(MODULE, "fetch_city_extract", side_effect=RuntimeError("extract outage")):
                 saved = MODULE.load_payload(None, MODULE.MOSCOW_BBOX, cache)
                 self.assertEqual(saved["lead_finder_status"], "cache")
                 with self.assertRaises(ValueError):
